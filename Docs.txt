@@ -1,0 +1,163 @@
+Hướng dẫn sử dụng bot:
+
+Bot được dử dụng để xử lí một số lượng lớn các chuỗi thô mà bạn cần tách ra làm nhiều dòng trong Telegram
+Đặc biệt Bot sẽ trả về dưới dạng Monospace của telegram giúp bạn dễ dàng Copy và quản lí các chuỗi, mã, mã giảm giá hơn
+
+
+Return Monospace Message
+
+
+
+VD:
+
+
+You Send:
+
+"NAPDATA"
+79970973973060
+79983741837172
+80019814319903
+80029551348155
+80038499880901
+80039169417842
+80057953874293
+80072952395689
+80082353511409
+80089520919166
+80094348726456
+80100221829242
+80129976234175
+80139908843837
+80186804159595
+80192692030946
+80204085466990
+80205593450666
+80212794347482
+80233071665736
+
+Bot Return
+				
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 79970973973060
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 79983741837172
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80019814319903
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80029551348155
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80038499880901
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80039169417842
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80057953874293
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80072952395689
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80082353511409
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80089520919166
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80094348726456
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80100221829242
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80129976234175
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80139908843837
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80186804159595
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80192692030946
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80204085466990
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80205593450666
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80212794347482
+
+Teleforming, [7/30/2025 5:24 PM]
+NAPDATA 80233071665736
+
+
+
+
+
+
+Hướng dẫn Vận hành Bot Telegram (Echo/Prefix Bot)
+
+Tài liệu này giải thích cách thức bot xử lý tin nhắn của người dùng và các bước logic cốt lõi được thực hiện trong hàm handle_message.
+
+1. Quy trình Hoạt động Tổng thể
+
+Quá trình vận hành của bot tuân theo một chu kỳ đơn giản:
+
+Khởi tạo (Initialization): Bot kết nối với Telegram API bằng token được cung cấp.
+
+Lắng nghe (Polling): Bot bắt đầu vòng lặp run_polling() để liên tục lắng nghe các tin nhắn mới gửi đến từ các cuộc trò chuyện.
+
+Xử lý (Handling): Mọi tin nhắn văn bản không phải là lệnh (ví dụ: /start hoặc /help) sẽ được chuyển đến hàm handle_message để xử lý.
+
+Phản hồi (Reply): Bot gửi tin nhắn phản hồi đã được định dạng trở lại cuộc trò chuyện.
+
+2. Chi tiết Xử lý Tin nhắn (handle_message)
+
+Hàm handle_message là nơi tất cả logic nghiệp vụ diễn ra. Quá trình này được thực hiện qua các bước sau:
+
+Bước 1: Chuẩn bị Dữ liệu và Kiểm tra
+
+Bot nhận toàn bộ nội dung tin nhắn (message).
+
+Tin nhắn được phân tách thành một danh sách các dòng riêng biệt (lines). Các dòng trống sẽ bị bỏ qua.
+
+Kiểm tra đầu vào: Nếu danh sách lines trống (người dùng gửi tin nhắn rỗng), bot phản hồi: "Bạn chưa gửi gì cả " và dừng lại.
+
+Bước 2: Phát hiện và Trích xuất Tiền tố (Prefix Logic)
+
+Đây là logic đặc biệt của bot:
+
+Bot kiểm tra dòng đầu tiên (lines[0]).
+
+Nó sử dụng Biểu thức Chính quy (re.match(r'^"(.+?)"$') để xem liệu dòng đầu tiên có khớp với mẫu nằm trong dấu ngoặc kép ("...") hay không.
+
+Điều kiện áp dụng tiền tố:
+
+Phải có sự khớp về định dạng dấu ngoặc kép.
+
+Tin nhắn phải có nhiều hơn một dòng (len(lines) > 1).
+
+Nếu điều kiện được thỏa mãn:
+
+Nội dung bên trong dấu ngoặc kép được trích xuất và lưu vào biến prefix.
+
+Dòng đầu tiên này được loại bỏ khỏi danh sách lines.
+
+Ngược lại, prefix vẫn là một chuỗi rỗng ("").
+
+Bước 3: Định dạng và Phản hồi
+
+Bot lặp qua từng dòng còn lại trong danh sách lines.
+
+Trong mỗi lần lặp, nó ghép prefix (nếu có) và nội dung dòng hiện tại (code) lại với nhau thành response_text.
+
+response_text sau đó được định dạng thành kiểu chữ đơn sắc (monospace) bằng hàm format_monospace(text).
+
+Bot gửi response_text đã được định dạng đó trở lại người dùng.
